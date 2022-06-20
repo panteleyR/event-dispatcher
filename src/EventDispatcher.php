@@ -11,13 +11,15 @@ class EventDispatcher implements EventDispatcherInterface, ListenerProviderInter
 
     public function dispatch(object $event): object
     {
-        foreach ($this->getListenersForEvent($event) as $listener) {
-            $listenerObject = $this->listeners[$listener['class']];
-            $listenerMethod = $listener['method'];
-            if (method_exists($listenerObject, $listenerMethod)) {
-                $listenerObject->{$listenerMethod}($event);
-            } else {
-                $listenerObject($event);
+        foreach ($this->getListenersForEvent($event) as $priority => $listeners) {
+            foreach ($listeners as $listener) {
+                $listenerObject = $this->listeners[$listener['class']];
+                $listenerMethod = $listener['method'];
+                if (method_exists($listenerObject, $listenerMethod)) {
+                    $listenerObject->{$listenerMethod}($event);
+                } else {
+                    $listenerObject($event);
+                }
             }
         }
 
